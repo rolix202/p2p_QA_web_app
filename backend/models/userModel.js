@@ -35,9 +35,13 @@ const UserSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    badges: [{
-        type: String
-    }],
+    badges: [
+        {
+            type: String,
+            enum: ["Icebreaker", "Problem Solver", "Top Helper"], 
+            default: "First Poster"
+        },
+    ],
     createdAt: {
         type: Date,
         default: Date.now

@@ -24,9 +24,9 @@ export const register_validation = withErrorMessage([
         .withMessage("CommunityID must follow the format FE/XX/YYYYYYYY")
         .trim()
         .custom(async (value) => {
-            const userID = await User.findOne({communityID: value})
+            const userID = await User.findOne({ communityID: value })
 
-            if (userID){
+            if (userID) {
                 throw new CustomError("User with the community ID already exist!", 409)
             }
         }),
@@ -76,3 +76,37 @@ export const login_validation = withErrorMessage([
         .withMessage("Password should be atleast 6 characters long")
         .trim()
 ]);
+
+export const question_validation = withErrorMessage([
+    body("title")
+        .isString()
+        .trim()
+        .notEmpty()
+        .withMessage("Title is required."),
+    body("description")
+        .isString()
+        .notEmpty()
+        .withMessage("Description is required.")
+        .isLength({ max: 1000 })
+        .withMessage("Description must not exceed 1000 characters."),
+    body("category")
+        .isString()
+        .notEmpty()
+        .withMessage("Category is required.")
+        .isIn([
+            "AI / Machine Learning",
+            "Animation",
+            "Cloud Computing",
+            "Cybersecurity",
+            "UI/UX Design",
+            "Data Analysis & Visualization",
+            "Data Science",
+            "DevOps",
+            "Game Development",
+            "Product Management",
+            "Quality Assurance",
+            "Software Development"
+        ])
+        .withMessage("Invalid category selected.")
+])
+
