@@ -1,6 +1,6 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import { Strategy } from "passport-jwt";
+import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import User from "../models/userModel.js";
 
 export const loginStrategy = () => {
@@ -26,5 +26,36 @@ export const loginStrategy = () => {
             }
         })
     );
+
+
+    let cookieExtractor = function(req){
+        let token = null;
+        if (req && req.cookies){
+            token = req.cookies.p_token
+        }
+
+        return token;
+    }
+
+    const jwtOptions = {
+        jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+        secretOrKey: process.env.JWT_SECRET,
+    }
+
+    passport.use(new JwtStrategy(jwtOptions, async (payload, done) => {
+        try {
+            const user = await User.findById(payload.id);
+
+            if (user){
+                return done(null, user)
+            } else {
+                return done(null, false, { message: "User not found!" })
+            }
+            
+        } catch (error) {
+            return done(error, false, { message: "Authentication error!" })
+        }
+    }))
+
     
 }

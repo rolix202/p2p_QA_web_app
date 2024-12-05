@@ -9,9 +9,14 @@ dotenv.config()
 import authRoute from "./router/authRoute.js"
 import { loginStrategy } from "./config/passportAuth.js";
 import passport from "passport";
+import cookieParser from "cookie-parser";
+
+
+app.use(morgan("dev"))
+
 
 app.use(express.json())
-app.use(morgan("dev"))
+app.use(cookieParser())
 
 dbConnect()
 
