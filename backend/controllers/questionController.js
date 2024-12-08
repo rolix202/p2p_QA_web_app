@@ -5,6 +5,8 @@ import { validationResult } from "express-validator"
 import imageService from "../utils/imageService.js"
 import CustomError from "../utils/customError.js"
 import { checkAndAssignBadge, updatePoints } from "../utils/updatePointsAndBadges.js"
+import Answer from "../models/answerModel.js"
+import mongoose from "mongoose"
 
 export const create_question = [
     fileUpload('photo_upload'),
@@ -90,11 +92,73 @@ export const create_question = [
 })]
 
 export const get_all_questions = asyncHandler(async (req, res) => {
-    res.send("Big boi")
+    const { page = 1, limit = 10, sort = '-createdAt', cateory, userId, search } = req.query;
+
+    // converting page and limit to numbers
+    const pageNumber = parseInt(page, 10);
+    const pageSize = parseInt(limit, 10);
+
+    const filter = {}
+
+    if (cateory) filter.category = cateory;
+    if (userId) filter.postedBy = userId;
+    if (search) {
+        filter.$or = [
+            { title: { $regex: search, $options: 'i' } },
+            { description: { $regex: search, $options: 'i' } }
+        ]
+    }
+
+    // Executing the query with pagination, sorting, and filtering
+    const questions = await Question.find(filter)
+        .sort(sort)
+        .skip((pageNumber -1) * pageSize)
+        .limit(pageSize)
+        .populate('postedBy', 'firstName lastName communityID')
+        .lean();
+
+    const totalQuestions = await Question.countDocuments(filter)
+
+    res.status(200).json({
+        status: "success",
+        data: questions,
+        meta: {
+            total: totalQuestions,
+            page: pageNumber,
+            limit: pageSize,
+            totalPages: Math.ceil(totalQuestions / pageSize)
+        }
+    })
 })
 
 export const single_question = asyncHandler(async (req, res) => {
-    res.send("boss man")
+    const { id } = req.params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ status: 'fail', message: 'Invalid question' });
+    }
+
+    const [ question, answers ] = await Promise.all([
+        Question.findById(id).populate('postedBy', 'communityID firstName lastName').lean(),
+        Answer.find({ question: id }).populate('postedBy', 'communityID firstName lastName points badges').lean()
+    ])
+
+    if (!question) {
+        return res.status(404).json({ status: 'fail', message: 'Question not found' });
+    }
+
+    res.status(200).json({
+        status: "success",
+        data: { question, answers },
+        meta: {
+            totalAnswer: answers.length
+        }
+    })
+    
+})
+
+export const post_answer = asyncHandler(async (req, res) => {
+    res.send("howdy")
 })
 
 
