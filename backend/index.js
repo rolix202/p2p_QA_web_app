@@ -5,29 +5,31 @@ import morgan from "morgan";
 import winston from "winston";
 import { dbConnect } from "./config/dbConfig.js";
 dotenv.config()
+import cors from "cors"
 
 import authRoute from "./router/authRoute.js"
 import questionRoute from "./router/questionRoute.js"
 import { loginStrategy } from "./config/passportAuth.js";
 import passport from "passport";
 import cookieParser from "cookie-parser";
-import { isAuthenticated } from "./middlewares/authenticateMiddleware.js";
-
 
 app.use(morgan("dev"))
 
-
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true 
+  }));
 
 dbConnect()
 
 loginStrategy()
 app.use(passport.initialize())
 
-
 app.use("/api/v1/auth", authRoute)
-app.use("/api/v1/question", isAuthenticated, questionRoute)
+app.use("/api/v1/question", questionRoute)
 
 
 app.get("/", (req, res) => {

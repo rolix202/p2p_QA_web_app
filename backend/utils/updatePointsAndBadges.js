@@ -1,6 +1,6 @@
 import User from "../models/userModel.js"
 
-export const updatePoints = async (userId, points) => {
+export const updatePoints = async (userId, points, ) => {
     const user = await User.findById(userId)
 
     if (user){

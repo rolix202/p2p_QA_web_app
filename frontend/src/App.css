@@ -1,0 +1,20 @@
+/* index.css */
+body {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3 {
+  color: #2c3e50;
+}
+
+button {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.05);
+}

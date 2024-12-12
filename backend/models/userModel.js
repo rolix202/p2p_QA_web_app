@@ -39,7 +39,7 @@ const UserSchema = new mongoose.Schema({
         {
             type: String,
             enum: ["Icebreaker", "Problem Solver", "Top Helper"], 
-            default: "First Poster"
+            default: "Icebreaker"
         },
     ],
     createdAt: {
@@ -60,6 +60,14 @@ UserSchema.pre("save", async function(next){
         next(error)
     }
 })
+
+UserSchema.pre("save", function(next) {
+    if (this.badges.length === 0) {
+        this.badges = ["Icebreaker"];
+    }
+    next();
+});
+
 
 UserSchema.methods.comparePassword =  async function(incomingPass, passInDB){
     return await bcrypt.compare(incomingPass, passInDB)

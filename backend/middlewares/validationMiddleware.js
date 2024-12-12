@@ -8,7 +8,7 @@ const withErrorMessage = (what_to_validate) => {
         (req, res, next) => {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                const errorMessage = errors.array().map((err) => err.msg);
+                const errorMessage = errors.array().map((err) => err.msg || err.message || "Validation error");
                 return res.status(400).json({ error: errorMessage });
             }
             next();
@@ -79,18 +79,15 @@ export const login_validation = withErrorMessage([
 
 export const question_validation = withErrorMessage([
     body("title")
-        .isString()
         .trim()
         .notEmpty()
         .withMessage("Title is required."),
     body("description")
-        .isString()
         .notEmpty()
         .withMessage("Description is required.")
         .isLength({ max: 1000 })
         .withMessage("Description must not exceed 1000 characters."),
     body("category")
-        .isString()
         .notEmpty()
         .withMessage("Category is required.")
         .isIn([
@@ -109,4 +106,5 @@ export const question_validation = withErrorMessage([
         ])
         .withMessage("Invalid category selected.")
 ])
+
 
