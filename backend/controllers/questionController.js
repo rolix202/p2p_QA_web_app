@@ -143,7 +143,7 @@ export const single_question = asyncHandler(async (req, res) => {
     }
 
     const [ question, answers ] = await Promise.all([
-        Question.findById(id).populate('postedBy', 'communityID firstName lastName').lean(),
+        Question.findById(id).populate('postedBy', 'communityID firstName lastName points').lean(),
         Answer.find({ question: id })
             .populate('postedBy', 'communityID firstName lastName points badges')
             .sort({ createdAt: -1 }) // Latest answers first
@@ -195,7 +195,7 @@ export const post_answer = asyncHandler(async (req, res) => {
         }
 
         try {
-            if (no_of_answers === 0) {
+            if (no_of_answers === 5) {
                 await checkAndAssignBadge(req.user.id, "Problem Solver");
             }
         } catch (error) {

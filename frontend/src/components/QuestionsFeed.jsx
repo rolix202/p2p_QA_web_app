@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link } from "react-router-dom";
 import axios from "axios";
 import {
   ChatBubbleOvalLeftEllipsisIcon,
 } from "@heroicons/react/24/solid";
+import { toast } from "react-toastify";
 
 const QuestionsFeed = () => {
   const [questions, setQuestions] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  // Fetch questions from backend
   const fetchQuestions = async () => {
     setLoading(true);
     try {
@@ -30,14 +30,16 @@ const QuestionsFeed = () => {
         return uniqueQuestions;
       });
     } catch (error) {
+      toast.error(error.response?.data?.message || "Error fetching questions");
       console.error("Error fetching questions:", error);
     }
     setLoading(false);
   };
 
   useEffect(() => {
+    console.log("Fetching questions...");
     fetchQuestions();
-  }, [page]);
+  }, []);
 
   return (
     <section className="questions bg-gradient-to-b from-green-50 via-gray-50 to-green-100 py-12">
@@ -51,8 +53,7 @@ const QuestionsFeed = () => {
               key={question._id}
               className="p-6 bg-white shadow-lg rounded-xl hover:shadow-xl transition transform hover:scale-105"
             >
-              {/* Question Title with Link */}
-              <Link to={`/question/${question._id}`}>
+              <Link to={`/question/${question._id}/detail`}>
                 <h3 className="text-2xl font-bold text-green-700 truncate hover:underline">
                   {question.title}
                 </h3>
@@ -77,28 +78,28 @@ const QuestionsFeed = () => {
               </div>
 
               <div className="flex justify-between items-center mt-4">
-                <div className="flex items-center space-x-2 text-gray-500">
-                  <span className="flex items-center">
-                    <ChatBubbleOvalLeftEllipsisIcon className="text-green-600 mr-2 h-4 w-4" />
-                    {question.answerCount || 0} Answers
-                  </span>
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-1 bg-gradient-to-r from-green-500 to-green-700 text-white text-sm font-semibold px-4 py-1 rounded-full shadow-md">
+                    <ChatBubbleOvalLeftEllipsisIcon className="h-5 w-5" />
+                    <span>{question.answerCount || 0} Answers</span>
+                  </div>
                 </div>
                 <Link
                   to={`/question/${question._id}/detail`}
-                  className="text-blue-600 hover:text-blue-800"
+                  className="text-blue-600 font-medium hover:text-blue-800 underline transition duration-300"
                 >
                   View Details
                 </Link>
               </div>
+
             </div>
           ))}
         </div>
         <div className="mt-12 flex justify-center">
           <Link to="/questions"
-            
-            className={`px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-full shadow-md ${
-              loading ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
-            }`}
+
+            className={`px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-full shadow-md ${loading ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
+              }`}
             disabled={loading}
           >
             {loading ? "Loading..." : "Load More Questions"}

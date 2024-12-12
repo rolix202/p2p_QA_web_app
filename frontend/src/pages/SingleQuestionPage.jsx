@@ -8,6 +8,8 @@ import {
     PencilSquareIcon,
 } from "@heroicons/react/24/solid";
 import { useParams } from "react-router-dom";
+import defaultAvatar from "../assets/default-avatar.png";
+import { toast } from "react-toastify";
 
 const SingleQuestionPage = () => {
     const [question, setQuestion] = useState(null);
@@ -20,12 +22,11 @@ const SingleQuestionPage = () => {
     const fetchQuestion = async () => {
         try {
             const { data } = await axios.get(`http://localhost:5000/api/v1/question/${id}`);
-
             setQuestion(data.data.question);
             setAnswers(data.data.answers);
             setLoading(false);
         } catch (error) {
-            console.error("Error fetching question:", error);
+            toast.error(error.response?.data?.message || "Error fetching question");
             setLoading(false);
         }
     };
@@ -48,27 +49,27 @@ const SingleQuestionPage = () => {
             console.error("Error voting:", error);
         }
     };
- 
+
     const handleAddAnswer = async () => {
         if (!newAnswer.trim()) return;
         try {
-            await axios.post(`http://localhost:5000/api/v1/question/${id}/answer`, {
+            const response = await axios.post(`http://localhost:5000/api/v1/question/${id}/answer`, {
                 questionId: question._id,
                 answerBody: newAnswer,
             }, { withCredentials: true });
+            toast.success(response.data.message || "Answer posted successfully.");
             setNewAnswer("");
             fetchQuestion(); // Re-fetch the data
         } catch (error) {
+            toast.error(error.response?.data?.message || "Error posting answer. Try again!");
             console.error("Error adding answer:", error);
         }
     };
-    
 
     if (loading) return <p>Loading...</p>;
 
     return (
         <div className="bg-gray-100 min-h-screen pb-16">
-
             {/* Hero Section */}
             <div className="relative bg-gradient-to-r from-green-500 to-green-700 text-white py-16">
                 <div
@@ -86,9 +87,23 @@ const SingleQuestionPage = () => {
                             </div>
                             <span>{new Date(question.createdAt).toLocaleDateString()}</span>
                         </div>
+
+                        {/* Community ID and Points */}
+                        <div className={`flex items-center justify-center ${question.photo_upload?.[0]?.image_secure_url ? "md:justify-start" : ""} space-x-4 mt-4`}>
+                            {/* Community ID Badge */}
+                            <div className="flex items-center space-x-2 bg-yellow-300 text-yellow-700 py-1 px-3 rounded-full shadow-md hover:bg-yellow-400 cursor-pointer transform transition duration-200 ease-in-out">
+                                <span className="font-semibold text-sm">Community ID:</span>
+                                <span className="text-sm">{question.postedBy.communityID}</span>
+                            </div>
+
+                            {/* Points Badge */}
+                            <div className="flex items-center space-x-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white py-1 px-3 rounded-full shadow-md hover:from-indigo-600 hover:to-blue-600 cursor-pointer transform transition duration-200 ease-in-out">
+                                <span className="font-semibold text-sm">Points:</span>
+                                <span className="text-sm">{question.postedBy.points || 0}</span>
+                            </div>
+                        </div>
                     </div>
 
-                
                     {/* Question Image */}
                     {question.photo_upload?.[0]?.image_secure_url && (
                         <div className="md:w-1/2 mt-8 md:mt-0 flex justify-center">
@@ -102,8 +117,6 @@ const SingleQuestionPage = () => {
                 </div>
             </div>
 
-
-
             {/* Answers Section */}
             <div className="max-w-5xl mx-auto mt-8 space-y-6 px-6">
                 {answers.map((answer) => (
@@ -113,7 +126,7 @@ const SingleQuestionPage = () => {
                     >
                         <div className="flex items-center mb-4">
                             <img
-                                src={answer.postedBy.avatar || "/default-avatar.png"}
+                                src={answer.postedBy.avatar || defaultAvatar}
                                 alt="User Avatar"
                                 className="w-12 h-12 rounded-full border-2 border-gray-200"
                             />
@@ -123,7 +136,7 @@ const SingleQuestionPage = () => {
                                     {answer.postedBy.badges && (
                                         <span className="ml-2 bg-green-100 text-green-700 px-2 py-1 text-xs rounded-full flex items-center space-x-1">
                                             <CheckCircleIcon className="w-4 h-4" />
-                                            <span>{answer.postedBy.badges[0]}</span>
+                                            <span>{answer.postedBy.communityID}</span>
                                         </span>
                                     )}
                                 </h3>

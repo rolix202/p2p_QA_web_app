@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const AddQuestionForm = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +12,7 @@ const AddQuestionForm = () => {
   });
   const [previewImages, setPreviewImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
 
   const categories = [
     "AI / Machine Learning",
@@ -66,11 +69,16 @@ const AddQuestionForm = () => {
         questionData,
         { withCredentials: true }
       );
-      console.log("Question added:", response.data);
+      toast.success(response?.data?.message || "Question created successfully!")
+
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
       
       setFormData({ title: "", description: "", category: "", photo_upload: [] });
       setPreviewImages([]);
     } catch (error) {
+        toast.error(error.response?.data?.message || "Error creating question. Try again!");
       console.error("Error adding question:", error);
     }
     setLoading(false);

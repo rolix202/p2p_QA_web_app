@@ -7,6 +7,8 @@ import AddQuestionForm from './pages/AddQuestionForm'
 import LoginPage from './pages/LoginPage'
 import SingleQuestionPage from "./pages/SingleQuestionPage";
 import QuestionPage from "./pages/QuestionPage";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 
 function App() {
@@ -24,6 +26,8 @@ function App() {
           </Routes>
         </main>
         <Footer />
+
+        <ToastContainer position="top-right" autoClose={5000} />
       </div>
     </Router>
   );
