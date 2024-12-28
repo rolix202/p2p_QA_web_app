@@ -14,6 +14,8 @@ const AddQuestionForm = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
 
+  const backendEndpoint = import.meta.env.VITE_BACKEND_ENDPOINT;
+
   const categories = [
     "AI / Machine Learning",
     "Animation",
@@ -65,7 +67,7 @@ const AddQuestionForm = () => {
     
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/v1/question",
+        `${backendEndpoint}/api/v1/question`,
         questionData,
         { withCredentials: true }
       );
@@ -78,8 +80,8 @@ const AddQuestionForm = () => {
       setFormData({ title: "", description: "", category: "", photo_upload: [] });
       setPreviewImages([]);
     } catch (error) {
-        toast.error(error.response?.data?.message || "Error creating question. Try again!");
-      console.error("Error adding question:", error);
+        toast.error(error.response?.data || error.response?.data?.message || error.message || "Error creating question. Try again!");
+      // console.error("Error adding question:", error);
     }
     setLoading(false);
   };

@@ -19,14 +19,19 @@ const SingleQuestionPage = () => {
 
     const { id } = useParams();
 
+    const backendEndpoint = import.meta.env.VITE_BACKEND_ENDPOINT;
+
+    // console.log(backendEndpoint);
+    
+
     const fetchQuestion = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:5000/api/v1/question/${id}`);
+            const { data } = await axios.get(`${backendEndpoint}/api/v1/question/${id}`);
             setQuestion(data.data.question);
             setAnswers(data.data.answers);
             setLoading(false);
         } catch (error) {
-            toast.error(error.response?.data?.message || "Error fetching question");
+            toast.error(error.response?.data || error.response?.data?.message || error.message || "Error fetching question");
             setLoading(false);
         }
     };
@@ -53,7 +58,7 @@ const SingleQuestionPage = () => {
     const handleAddAnswer = async () => {
         if (!newAnswer.trim()) return;
         try {
-            const response = await axios.post(`http://localhost:5000/api/v1/question/${id}/answer`, {
+            const response = await axios.post(`${backendEndpoint}/api/v1/question/${id}/answer`, {
                 questionId: question._id,
                 answerBody: newAnswer,
             }, { withCredentials: true });
@@ -61,8 +66,8 @@ const SingleQuestionPage = () => {
             setNewAnswer("");
             fetchQuestion(); // Re-fetch the data
         } catch (error) {
-            toast.error(error.response?.data?.message || "Error posting answer. Try again!");
-            console.error("Error adding answer:", error);
+            toast.error(error.response?.data || error.response?.data?.message || error.message || "Error posting answer. Try again!");
+            // console.error("Error adding answer:", error);
         }
     };
 

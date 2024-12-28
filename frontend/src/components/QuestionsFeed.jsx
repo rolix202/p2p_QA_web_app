@@ -11,11 +11,14 @@ const QuestionsFeed = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
+
+  const backendEndpoint = import.meta.env.VITE_BACKEND_ENDPOINT;
+
   const fetchQuestions = async () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/question?page=${page}`,
+        `${backendEndpoint}/api/v1/question?page=${page}`,
         { withCredentials: true }
       );
       // Merge new questions without duplicates
@@ -30,8 +33,7 @@ const QuestionsFeed = () => {
         return uniqueQuestions;
       });
     } catch (error) {
-      toast.error(error.response?.data?.message || "Error fetching questions");
-      console.error("Error fetching questions:", error);
+      toast.error(error.response?.data || error.response?.data?.message || error.message || "Error fetching question");
     }
     setLoading(false);
   };

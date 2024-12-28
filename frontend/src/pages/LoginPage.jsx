@@ -7,6 +7,8 @@ const LoginPage = () => {
         password: ""
     })
 
+    const backendEndpoint = import.meta.env.VITE_BACKEND_ENDPOINT;
+
     const handlFormInput = (e) => {
         const { name, value } = e.target
         setFormDetails((prev) => {
@@ -21,7 +23,7 @@ const LoginPage = () => {
         e.preventDefault()
         
         try {
-            const response = await axios.post("http://localhost:5000/api/v1/auth/login", formDetails, {
+            const response = await axios.post(`${backendEndpoint}/api/v1/auth/login`, formDetails, {
                 withCredentials: true
             })
 
